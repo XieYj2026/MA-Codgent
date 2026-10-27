@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MA Codgent · 医药数据科学 × AI 智能体</title>
+<meta name="description" content="MA Codgent（主理人 Dr. Xie）提供医药数据科学方法学、临床预测模型与企业级 AI 智能体研发与定制服务。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E63FF'/%3E%3Ctext x='16' y='23' font-size='19' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1220; --navy2:#111C33; --blue:#1E63FF; --blue-lt:#5B8CFF;
+  --cyan:#38D9E6; --blue-dp:#1E63FF; --amber:#FBD38D;
+  --ink:#E7EEF9; --ink-dim:#9DB0CE; --line:rgba(255,255,255,.10);
+  --card:rgba(255,255,255,.045); --card-hi:rgba(255,255,255,.08);
+  --grad:linear-gradient(115deg,#5B8CFF,#38D9E6 55%,#1E63FF);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans SC','Montserrat','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--navy); color:var(--ink);
+  -webkit-font-smoothing:antialiased; overflow-x:hidden; line-height:1.6;
+}
+/* ---------- aurora backdrop ---------- */
+.aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;background:
+  radial-gradient(1000px 600px at 15% -10%,rgba(79,155,232,.22),transparent 60%),
+  radial-gradient(900px 600px at 100% 0%,rgba(56,217,230,.14),transparent 55%),
+  radial-gradient(1000px 700px at 90% 110%,rgba(246,137,61,.14),transparent 55%),
+  var(--navy);}
+.aurora::before,.aurora::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+.aurora::before{width:520px;height:520px;left:-120px;top:8%;background:radial-gradient(circle,#1E63FF,transparent 70%);animation:drift 22s ease-in-out infinite alternate}
+.aurora::after{width:560px;height:560px;right:-140px;bottom:4%;background:radial-gradient(circle,#38D9E6,transparent 70%);animation:drift2 26s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(80px,60px)}}
+@keyframes drift2{from{transform:translate(0,0)}to{transform:translate(-70px,-50px)}}
+.grid-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 60% at 50% 20%,#000,transparent 90%)}
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:rgba(11,18,32,.62);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1160px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Montserrat';font-weight:900;letter-spacing:1px;font-size:20px;display:flex;align-items:center;gap:10px}
+.logo .dot{width:12px;height:12px;border-radius:3px;background:var(--grad);box-shadow:0 0 16px rgba(56,217,230,.7)}
+.logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:28px;font-size:15px}
+.nav-links a{color:var(--ink-dim);text-decoration:none;transition:.2s;position:relative}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{background:var(--grad);color:#08111f;font-weight:700;padding:9px 18px;border-radius:999px;text-decoration:none;font-size:14px;transition:.25s;box-shadow:0 6px 20px rgba(56,217,230,.25)}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(56,217,230,.4)}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+.burger span{width:24px;height:2px;background:var(--ink);border-radius:2px}
+/* ---------- layout ---------- */
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+section{padding:122px 0;position:relative}
+section + section::before{
+  content:"";position:absolute;top:-61px;left:50%;transform:translateX(-50%);
+  width:min(100%,1160px);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(56,217,230,.15),rgba(246,137,61,.15),transparent)}
+.eyebrow{position:relative;font-family:'Montserrat';letter-spacing:.32em;font-size:13px;font-weight:700;color:var(--cyan);text-transform:uppercase;margin-bottom:20px;padding-top:8px}
+.eyebrow::before{content:"";display:block;width:48px;height:3px;border-radius:3px;margin-bottom:18px;
+  background:linear-gradient(90deg,var(--cyan),var(--orange));box-shadow:0 0 14px rgba(56,217,230,.45)}
+.h2{font-size:clamp(28px,4vw,42px);font-weight:900;color:#fff;line-height:1.18;letter-spacing:.5px}
+.sub{color:var(--ink-dim);font-size:16px;margin-top:16px;max-width:640px;line-height:1.7}
+.reveal{opacity:0;transform:translateY(26px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+/* ---------- hero ---------- */
+.hero{padding:120px 0 90px;text-align:center;position:relative}
+.pill{display:inline-flex;align-items:center;gap:9px;font-size:14px;color:var(--ink-dim);
+  background:var(--card);border:1px solid var(--line);padding:8px 16px;border-radius:999px;margin-bottom:30px}
+.pill i{width:7px;height:7px;border-radius:50%;background:#3DD68C;box-shadow:0 0 10px #3DD68C;display:inline-block}
+.hero h1{font-size:clamp(40px,7vw,80px);font-weight:900;line-height:1.18;letter-spacing:1px;color:#fff}
+.hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .en{display:block;font-family:'Montserrat';font-weight:600;font-size:clamp(15px,2.2vw,22px);letter-spacing:6px;color:var(--ink-dim);margin-top:20px}
+.hero p.lead{font-size:clamp(17px,2.4vw,21px);color:#C6D4EC;max-width:680px;margin:28px auto 0}
+.hero .cta{margin-top:40px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{padding:15px 30px;border-radius:999px;font-weight:700;font-size:16px;text-decoration:none;transition:.25s;display:inline-flex;align-items:center;gap:9px}
+.btn-primary{background:var(--grad);color:#08111f;box-shadow:0 10px 30px rgba(56,217,230,.3)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(56,217,230,.45)}
+.btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{background:var(--card-hi);transform:translateY(-3px)}
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.about-txt p{color:#C6D4EC;font-size:16px;margin-top:18px}
+.about-txt b{color:#fff}
+.tagline-card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:0 14px 14px 0;padding:18px 22px;margin-top:26px;color:var(--ink-dim);font-size:15px}
+.tagline-card b{color:var(--amber)}
+.poster-frame{border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.5);position:relative;transition:.4s}
+.poster-frame:hover{transform:translateY(-6px) rotate(-.4deg)}
+.poster-frame img{width:100%;display:block}
+.poster-cap{text-align:center;color:var(--ink-dim);font-size:13px;margin-top:14px}
+.poster-cap a{color:var(--cyan);text-decoration:none}
+/* ---------- columns / 专栏 ---------- */
+.col-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.col-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;position:relative;overflow:hidden;transition:.32s;display:flex;flex-direction:column}
+.col-card::before{content:"";position:absolute;inset:0;background:var(--grad);opacity:0;transition:.32s;z-index:0}
+.col-card:hover{transform:translateY(-7px);border-color:transparent}
+.col-card:hover::before{opacity:.09}
+.col-card>*{position:relative;z-index:1}
+.col-badge{display:inline-block;font-family:'Montserrat';font-size:12px;font-weight:700;letter-spacing:1px;padding:5px 12px;border-radius:999px;margin-bottom:16px}
+.b-core{background:rgba(56,217,230,.16);color:var(--cyan);border:1px solid rgba(56,217,230,.35)}
+.b-new{background:rgba(246,137,61,.16);color:var(--orange);border:1px solid rgba(246,137,61,.35)}
+.col-card h3{font-size:22px;font-weight:900;color:#fff;line-height:1.3}
+.col-card .meta{font-size:13px;color:var(--ink-dim);margin:10px 0 14px;font-family:'Montserrat'}
+.col-card p{color:#C6D4EC;font-size:15px;flex:1}
+.col-link{margin-top:20px;display:inline-flex;align-items:center;gap:8px;color:var(--cyan);font-weight:700;text-decoration:none;font-size:15px;transition:.2s}
+.col-link:hover{gap:13px}
+/* ---------- platforms ---------- */
+.plat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:52px}
+.plat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 14px;text-align:center;text-decoration:none;color:var(--ink);transition:.3s;display:block}
+.plat:hover{transform:translateY(-6px);background:var(--card-hi);border-color:rgba(79,155,232,.5)}
+.plat .ic{width:48px;height:48px;margin:0 auto 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat';font-weight:900;font-size:20px;color:#fff}
+.plat .pn{font-weight:700;font-size:16px}
+.plat .pd{font-size:12px;color:var(--ink-dim);margin-top:5px}
+/* ---------- lines ---------- */
+.lines{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:52px}
+.line{border-radius:22px;padding:34px;position:relative;overflow:hidden;border:1px solid var(--line)}
+.line-a{background:linear-gradient(150deg,rgba(43,108,176,.28),rgba(56,217,230,.10))}
+.line-b{background:linear-gradient(150deg,rgba(246,137,61,.26),rgba(192,86,33,.10))}
+.line .tg{font-family:'Montserrat';font-size:13px;letter-spacing:3px;color:var(--ink-dim)}
+.line h3{font-size:22px;font-weight:900;color:#fff;margin:8px 0 18px}
+.line ul{list-style:none}
+.line li{padding-left:26px;position:relative;margin-bottom:11px;color:#D5E1F3;font-size:15px}
+.line li::before{content:"";position:absolute;left:0;top:9px;width:11px;height:11px;border-radius:3px;background:var(--grad)}
+/* ---------- capability ---------- */
+.caps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:52px}
+.cap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;transition:.3s}
+.cap:hover{transform:translateY(-5px);border-color:rgba(56,217,230,.4);background:var(--card-hi)}
+.cap .n{font-family:'Montserrat';font-weight:800;font-size:15px;color:var(--cyan)}
+.cap .t{font-size:17px;font-weight:700;color:#fff;margin:10px 0 6px}
+.cap .d{font-size:15px;color:var(--ink-dim);line-height:1.55}
+/* ---------- contact ---------- */
+.contact{text-align:center}
+.contact-card{background:linear-gradient(150deg,rgba(43,108,176,.22),rgba(246,137,61,.14));border:1px solid var(--line);border-radius:28px;padding:64px 40px;margin-top:40px;position:relative;overflow:hidden}
+.contact-card h2{font-size:clamp(26px,4vw,40px);font-weight:900;color:#fff}
+.contact-card p{color:#C6D4EC;font-size:16px;margin:18px auto 0;max-width:560px}
+.contact-actions{margin-top:34px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wx-box{display:inline-flex;align-items:center;gap:12px;margin:28px auto 0;padding:12px 18px;background:rgba(56,217,230,.08);border:1px solid rgba(56,217,230,.35);border-radius:14px;color:#E6F0FF}
+.wx-label{font-size:11px;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase}
+.wx-id{font-family:'Montserrat','Noto Sans SC';font-weight:700;font-size:18px;letter-spacing:.02em;color:#fff}
+.wx-copy{margin-left:4px;background:var(--cyan);color:#06222b;border:none;border-radius:9px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.wx-copy:hover{opacity:.85}
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:44px 0;margin-top:40px}
+.foot-in{max-width:1160px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+.foot-in .fl{font-family:'Montserrat';font-weight:900;font-size:20px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.foot-in .fr{color:var(--ink-dim);font-size:13px;text-align:right}
+/* ---------- agent custom service ---------- */
+.agent-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.agent-tier{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 26px;display:flex;flex-direction:column;position:relative;transition:.32s;overflow:hidden}
+.agent-tier:hover{transform:translateY(-7px);border-color:rgba(79,155,232,.5)}
+.agent-tier.feat{border-color:rgba(56,217,230,.55);background:linear-gradient(160deg,rgba(43,108,176,.20),rgba(56,217,230,.08))}
+.agent-tier .at-tag{position:absolute;top:18px;right:-36px;transform:rotate(45deg);background:var(--orange);color:#08111f;font-size:11px;font-weight:800;padding:5px 40px;letter-spacing:1px;box-shadow:0 4px 12px rgba(246,137,61,.4)}
+.agent-tier .at-head{font-family:'Montserrat';font-weight:700;font-size:12px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
+.agent-tier .at-name{font-size:22px;font-weight:900;color:#fff;margin:7px 0 10px}
+.agent-tier .at-price{font-family:'Montserrat';font-weight:800;font-size:clamp(28px,3.4vw,36px);background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.agent-tier .at-price small{font-size:12.5px;-webkit-text-fill-color:var(--ink-dim);font-family:'Noto Sans SC';font-weight:500;margin-left:4px}
+.agent-tier .at-price.at-quote{font-family:'Noto Sans SC';font-weight:700;font-size:clamp(17px,2vw,21px);background:none;-webkit-background-clip:initial;background-clip:initial;color:var(--cyan);line-height:1.2}
+.agent-tier .at-cycle{font-size:13px;color:var(--ink-dim);margin:9px 0 16px}
+.agent-tier ul{list-style:none;flex:1}
+.agent-tier li{padding-left:22px;position:relative;margin-bottom:9px;color:#D5E1F3;font-size:14px;line-height:1.5}
+.agent-tier li::before{content:"";position:absolute;left:0;top:7px;width:9px;height:9px;border-radius:3px;background:var(--grad)}
+.agent-tier .at-foot{margin-top:18px;font-size:13px;color:var(--amber);font-weight:600;border-top:1px solid var(--line);padding-top:14px}
+.agent-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.agent-tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-size:14px;color:#C6D4EC}
+.agent-add{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.agent-add .ad{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px;transition:.3s}
+.agent-add .ad:hover{transform:translateY(-4px);border-color:rgba(56,217,230,.4);background:var(--card-hi)}
+.agent-add .ad .t{font-size:15px;font-weight:700;color:#fff}
+.agent-add .ad .p{font-family:'Montserrat';font-weight:800;font-size:17px;color:var(--cyan);margin-top:8px}
+.agent-add .ad .d{font-size:12.5px;color:var(--ink-dim);margin-top:6px;line-height:1.5}
+/* ---------- responsive ---------- */
+@media(max-width:860px){
+  .nav-links{display:none}.burger{display:flex}
+  .about-grid{grid-template-columns:1fr;gap:34px}
+  .col-grid{grid-template-columns:1fr}
+  .plat-grid{grid-template-columns:repeat(2,1fr)}
+  .lines{grid-template-columns:1fr}
+  .caps{grid-template-columns:repeat(2,1fr)}
+  .agent-tiers,.agent-diff{grid-template-columns:1fr}
+  .agent-add{grid-template-columns:repeat(2,1fr)}
+  section{padding:88px 0}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-in">
+    <div class="logo"><span>MA CODGENT</span><div class="dot"></div></div>
+    <div class="nav-links">
+      <a href="#about">关于我们</a>
+      <a href="#columns">专栏</a>
+      <a href="#platforms">内容平台</a>
+      <a href="#services">技术服务</a>
+      <a href="#agent">智能体定制</a>
+      <a href="#capability">能力</a>
+    </div>
+    <a href="../../MDCODE工作台.html" id="backToHub" style="color:#C6D4EC;text-decoration:none;font-size:13.5px;font-weight:600;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:999px;transition:.2s;white-space:nowrap">← 返回工作台</a>
+    <a class="nav-cta" href="#contact">合作咨询</a>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="pill"><i></i> 开始于 CSDN 的一个技术频道 · 主理人 Dr. Xie</div>
+  <h1>医药数据科学<br>遇上 <span class="g">AI 智能体</span>
+    <span class="en">MEDICAL DATA SCIENCE × AI AGENTS</span>
+  </h1>
+  <p class="lead">MA Codgent 聚焦医药数据科学方法学、临床预测模型与企业级 AI 智能体的研发与交付。从统计分析到智能体工程，提供可复现、可落地的技术能力。</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="#columns">浏览专栏内容 →</a>
+    <a class="btn btn-ghost" href="#contact">合作沟通</a>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section id="about" class="wrap">
+  <div class="about-grid">
+    <div class="about-txt reveal">
+      <div class="eyebrow">Who We Are</div>
+      <h2 class="h2">我们是谁</h2>
+      <p>MA Codgent 由 Dr. Xie 主理，以医药数据科学方法学为根基，业务覆盖临床预测模型、统计分析与 AI 智能体工程。团队承接高校课题组与企业级技术交付，坚持医学严谨与方法学可复现。</p>
+      <p>我们相信：AI 让「写代码」变得廉价，而「分得清分析对不对」才真正值钱。医学终审与可复现，是所有内容与交付的底线。</p>
+      <div class="tagline-card">核心专栏《<b>用 R 探索医药数据科学</b>》为合作课题组教学、视频与线下培训的核心教材；配套《用 AI 赋能医药研究实战》《AIGC 技术应用指南》持续建设中。</div>
+    </div>
+    <div class="reveal">
+      <div class="poster-frame"><img src="assets/poster.jpg" alt="MA Codgent 团队介绍海报"></div>
+      <div class="poster-cap">团队介绍海报 · <a href="assets/poster.jpg" download>下载高清版 ↓</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- COLUMNS -->
+<section id="columns" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">Columns · 核心专栏</div>
+    <h2 class="h2">系统化专栏，边学边落地</h2>
+    <p class="sub">从 R 语言医药统计到 AI 赋能科研实战，成体系、可复现、持续更新。点击卡片前往对应平台订阅或购买。</p>
+  </div>
+  <div class="col-grid" id="colGrid"><!-- injected by JS --></div>
+</section>
+
+<!-- PLATFORMS -->
+<section id="platforms" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">Content Matrix · 内容矩阵</div>
+    <h2 class="h2">在你常用的平台找到我们</h2>
+    <p class="sub">同一套专业内容，多平台分发。挑你习惯的平台关注 / 订阅即可。</p>
+  </div>
+  <div class="plat-grid" id="platGrid"><!-- injected by JS --></div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">Two Service Lines · 技术服务</div>
+    <h2 class="h2">两条业务线</h2>
+    <p class="sub">面向高校课题组与中小企业，提供从方法学到工程落地的两类交付。</p>
+  </div>
+  <div class="lines">
+    <div class="line line-a reveal">
+      <div class="tg">LINE ①</div>
+      <h3>临床预测模型 + 专利</h3>
+      <ul>
+        <li>临床预测模型构建（列线图 / 机器学习）</li>
+        <li>SCI 级方法学验证与稿件配套</li>
+        <li>专利创新点挖掘与申报支持</li>
+        <li>全流程可复现、贴身跟进</li>
+      </ul>
+    </div>
+    <div class="line line-b reveal">
+      <div class="tg">LINE ②</div>
+      <h3>企业级 AI 智能体</h3>
+      <ul>
+        <li>RAG 知识库 / 工作流自动化</li>
+        <li>多智能体协作交付</li>
+        <li>面向课题组与中小企业的轻量定制</li>
+        <li>企业级工程标准，稳定可维护</li>
+      </ul>
+      <a class="col-link" href="#agent">查看完整定制方案 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- AGENT CUSTOM SERVICE -->
+<section id="agent" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">Custom AI Agents · 智能体定制</div>
+    <h2 class="h2">按你的业务，定制专属 AI 智能体</h2>
+    <p class="sub">不限定行业——凡有「知识库 + 重复流程 + 人工审核」的场景都能做。医学是我们擅长的一项，但不强求。三个别人没有的硬条件，是我们敢接政务 / 金融 / 医疗客户的原因。</p>
+  </div>
+
+  <!-- 三档套餐 -->
+  <div class="agent-tiers">
+    <div class="agent-tier reveal">
+      <div class="at-head">STARTER</div>
+      <div class="at-name">诊断包</div>
+      <div class="at-price at-quote">联系获取方案</div>
+      <div class="at-cycle">约 5 个工作日 · 立项 / 场景筛选</div>
+      <ul>
+        <li>2 次需求沟通会 + 业务流程梳理</li>
+        <li>候选场景排序与投入产出测算</li>
+        <li>模型费用预估 + 实施路线图</li>
+        <li>输出《需求诊断报告》</li>
+      </ul>
+      <div class="at-foot">门槛低，先看清值不值得做</div>
+    </div>
+
+    <div class="agent-tier reveal">
+      <div class="at-head">VALIDATE</div>
+      <div class="at-name">验证版</div>
+      <div class="at-price at-quote">联系获取方案</div>
+      <div class="at-cycle">3–4 周 · 小范围验证效果</div>
+      <ul>
+        <li>1 个智能体 + 知识库（≤300 篇 / 2GB）</li>
+        <li>1 条自动化流程 + 网页入口</li>
+        <li>≤50 个测试用例，质保 15 天</li>
+        <li>规格书 / 验收报告 / 操作手册</li>
+      </ul>
+      <div class="at-foot">首单主攻档，让客户看到有用</div>
+    </div>
+
+    <div class="agent-tier reveal">
+      <div class="at-head">PRODUCTION</div>
+      <div class="at-name">生产版</div>
+      <div class="at-price at-quote">联系获取方案</div>
+      <div class="at-cycle">6–9 周 · 单部门正式上线</div>
+      <ul>
+        <li>正式上线智能体 + ≤3 条流程</li>
+        <li>知识库（≤500 篇 / 5GB，可溯源）</li>
+        <li>监控看板 + ≤100 用例，质保 30 天</li>
+        <li>技术设计 / 运维手册 / 培训</li>
+      </ul>
+      <div class="at-foot">上线后转年度维护，持续有收入</div>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:18px;font-size:13px">具体报价按业务规模与范围评估 · <a href="#contact" style="color:var(--cyan);text-decoration:none">联系获取定制方案 →</a></p>
+
+  <div class="agent-tags">
+    <span>电商</span><span>教育</span><span>金融</span><span>政务</span><span>制造</span><span>医疗</span><span>法律</span><span>媒体</span>
+  </div>
+
+  <!-- 加购项 -->
+  <div class="reveal" style="margin-top:60px">
+    <div class="eyebrow">Add-ons · 按需加购</div>
+    <h2 class="h2">可选模块</h2>
+    <p class="sub">底价先不动，用加赠服务而非降价抢首单，保护品牌与毛利。</p>
+  </div>
+  <div class="agent-add">
+    <div class="ad"><div class="t">本地部署方案</div><div class="p">选配</div><div class="d">合作方出全套本地推理环境，数据不出本地。</div></div>
+    <div class="ad"><div class="t">操作人员培训</div><div class="p">选配</div><div class="d">结合《人工智能应用实战宝典》，教客户方运维。</div></div>
+    <div class="ad"><div class="t">医学终审与合规</div><div class="p">选配</div><div class="d">仅医疗 / 药企客户选配，医学博士终审。</div></div>
+    <div class="ad"><div class="t">即时通讯入口</div><div class="p">选配</div><div class="d">飞书 / 企业微信 / 钉钉接入。</div></div>
+    <div class="ad"><div class="t">人工审批环节</div><div class="p">选配</div><div class="d">关键动作人工确认，防出错。</div></div>
+    <div class="ad"><div class="t">统一登录 SSO</div><div class="p">选配</div><div class="d">企业账号体系打通。</div></div>
+    <div class="ad"><div class="t">模型调用费优化</div><div class="p">选配</div><div class="d">每轮调用成本压降。</div></div>
+    <div class="ad"><div class="t">国内大模型直连</div><div class="p">标配</div><div class="d">不单列收费，已包含在方案中。</div></div>
+  </div>
+
+</section>
+
+<!-- CAPABILITY -->
+<section id="capability" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">Capability Matrix</div>
+    <h2 class="h2">能力矩阵</h2>
+    <p class="sub">临床 + 统计 + AI 工程的复合能力，覆盖科研全链路。</p>
+  </div>
+  <div class="caps">
+    <div class="cap reveal"><div class="n">01</div><div class="t">临床预测模型</div><div class="d">竞争风险 · 列线图 · 校准 · DCA</div></div>
+    <div class="cap reveal"><div class="n">02</div><div class="t">专利创新点挖掘</div><div class="d">disclosure → 合规转化</div></div>
+    <div class="cap reveal"><div class="n">03</div><div class="t">企业级 AI 智能体</div><div class="d">RAG · 工作流 · 多智能体</div></div>
+    <div class="cap reveal"><div class="n">04</div><div class="t">医学数据把关</div><div class="d">统计 + 临床双重审核</div></div>
+    <div class="cap reveal"><div class="n">05</div><div class="t">R 医药统计</div><div class="d">Cox · 可视化 · Meta · ML</div></div>
+    <div class="cap reveal"><div class="n">06</div><div class="t">SCI 级验证</div><div class="d">外部验证 · TRIPOD 规范</div></div>
+    <div class="cap reveal"><div class="n">07</div><div class="t">可复用 Skills</div><div class="d">NHANES 复现 · 科普改写</div></div>
+    <div class="cap reveal"><div class="n">08</div><div class="t">内容矩阵引流</div><div class="d">多平台专业背书沉淀</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="wrap contact">
+  <div class="contact-card reveal">
+    <div class="eyebrow" style="text-align:center">Let's Work Together</div>
+    <h2>有课题、有项目，聊聊？</h2>
+    <p>无论是临床预测模型、SCI 方法学，还是企业级 AI 智能体落地，欢迎联系我们。也欢迎教授 / 课题组洽谈教学与培训合作。</p>
+    <div class="wx-box">
+      <span class="wx-label">微信</span>
+      <span class="wx-id" id="wxId">Jian_Kayla</span>
+      <button class="wx-copy" id="wxCopy" type="button">复制</button>
+    </div>
+    <div class="contact-actions">
+      <a class="btn btn-ghost" id="ctaSecond" href="#">查看主页 / 专栏</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-in">
+    <div>
+      <div class="fl">MA CODGENT</div>
+      <div style="color:var(--ink-dim);font-size:13px;margin-top:6px">从数据发现超级智能 · 高校课题组的技术伙伴</div>
+    </div>
+    <div class="fr">
+      主理人 Dr. Xie · 广东<br>
+      © <span id="yr">2026</span> MA Codgent. 内容与方法学版权所有.
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ★★★ 只改这里：把下面的 # 换成你各平台的真实链接即可 ★★★
+   （改完保存、推到 GitHub 就自动生效，无需改其它地方）
+   ============================================================ */
+const LINKS = {
+  columns: [
+    { badge:"核心专栏", cls:"b-core", title:"用 R 探索医药数据科学",
+      meta:"CSDN · 220 万字+ · 持续更新",
+      desc:"从 R 语言基础到临床生存分析、预测模型、可重复报告，医药数据科学的系统教程，也是课题组教学核心教材。",
+      cta:"前往订阅", url:"https://blog.csdn.net/2301_79425796/category_12729892.html" },
+    { badge:"进行中", cls:"b-new", title:"用 AI 赋能医药研究实战",
+      meta:"CSDN · 优惠创建期",
+      desc:"AI 时代如何用大模型 + Agent 加速文献、统计、写作与复现，聚焦「会用 AI 且能验证对错」的实战方法。",
+      cta:"前往订阅", url:"https://blog.csdn.net/2301_79425796/category_13152001.html" },
+    { badge:"进行中", cls:"b-new", title:"人工智能应用实战宝典",
+      meta:"CSDN · 优惠创建期",
+      desc:"面向科研与内容生产的 AIGC 工程实践：提示工程、工作流搭建、多智能体协作与落地案例。",
+      cta:"前往订阅", url:"https://blog.csdn.net/2301_79425796/category_12877049.html" }
+  ],
+  platforms: [
+    { name:"CSDN",   desc:"技术专栏主阵地", color:"linear-gradient(135deg,#C4302B,#F6893D)", ab:"C", url:"https://blog.csdn.net/2301_79425796" },
+    { name:"知乎",   desc:"深度问答/文章",  color:"linear-gradient(135deg,#0F88EB,#4F9BE8)", ab:"知", url:"https://www.zhihu.com/people/yesdrxie" },
+    { name:"小红书", desc:"科普/干货笔记",  color:"linear-gradient(135deg,#FF2442,#FF6B81)", ab:"红", url:"https://www.xiaohongshu.com/explore" },
+    { name:"公众号", desc:"长文/课程通知",  color:"linear-gradient(135deg,#2BA245,#3DD68C)", ab:"微", url:"#" },
+    { name:"海外",   desc:"YouTube 等",     color:"linear-gradient(135deg,#5A6B8C,#9DB0CE)", ab:"YT", url:"#" }
+  ],
+  // 联系区两个按钮
+  contactMain:   "#",   // 例如：mailto:你的邮箱  或  微信/合作页链接
+  contactSecond: "https://blog.csdn.net/2301_79425796",    // CSDN 主页
+  wechat:        "Jian_Kayla"   // 联系微信号（联系区展示 + 一键复制）
+};
+/* ============================================================ */
+
+/* render columns */
+document.getElementById('colGrid').innerHTML = LINKS.columns.map(c=>`
+  <a class="col-card reveal" href="${c.url}" target="_blank" rel="noopener">
+    <span class="col-badge ${c.cls}">${c.badge}</span>
+    <h3>《${c.title}》</h3>
+    <div class="meta">${c.meta}</div>
+    <p>${c.desc}</p>
+    <span class="col-link">${c.cta} →</span>
+  </a>`).join('');
+
+/* render platforms (graceful: "#" = 敬请期待, 不出现死链) */
+document.getElementById('platGrid').innerHTML = LINKS.platforms.map(p=>{
+  if(!p.url || p.url === '#'){
+    return `<div class="plat reveal" style="opacity:.55;cursor:default">
+      <div class="ic" style="background:${p.color}">${p.ab}</div>
+      <div class="pn">${p.name}</div>
+      <div class="pd">敬请期待</div>
+    </div>`;
+  }
+  return `
+  <a class="plat reveal" href="${p.url}" target="_blank" rel="noopener">
+    <div class="ic" style="background:${p.color}">${p.ab}</div>
+    <div class="pn">${p.name}</div>
+    <div class="pd">${p.desc}</div>
+  </a>`;
+}).join('');
+
+/* contact links + 微信复制 */
+(function(){
+  const cMain = document.getElementById('ctaMain');
+  if(cMain){
+    if(!LINKS.contactMain || LINKS.contactMain === '#'){ cMain.style.display = 'none'; }
+    else { cMain.href = LINKS.contactMain; }
+  }
+  const cSec = document.getElementById('ctaSecond');
+  if(cSec) cSec.href = LINKS.contactSecond || '#';
+  const wxId = document.getElementById('wxId');
+  const wxCopy = document.getElementById('wxCopy');
+  if(wxId && wxCopy){
+    if(LINKS.wechat) wxId.textContent = LINKS.wechat;
+    wxCopy.addEventListener('click', ()=>{
+      const id = wxId.textContent.trim();
+      const done = ()=>{ const t = wxCopy.textContent; wxCopy.textContent = '已复制'; setTimeout(()=>wxCopy.textContent = t, 1500); };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(id).then(done).catch(done);
+      } else { done(); }
+    });
+  }
+})();
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* 内部「返回工作台」链接：仅在本地 file:// 浏览时显示，线上站點隐藏，避免 404 */
+if(location.protocol !== 'file:'){
+  const b = document.getElementById('backToHub');
+  if(b) b.style.display = 'none';
+}
+
+/* scroll reveal */
+const io = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* mobile menu (simple scroll-to + toggle) */
+document.getElementById('burger').addEventListener('click',()=>{
+  const nl=document.querySelector('.nav-links');
+  const open=nl.style.display==='flex';
+  nl.style.display=open?'':'flex';
+  if(!open){nl.style.position='absolute';nl.style.top='60px';nl.style.right='24px';nl.style.flexDirection='column';nl.style.background='rgba(11,18,32,.95)';nl.style.padding='18px 22px';nl.style.borderRadius='14px';nl.style.border='1px solid var(--line)';nl.style.gap='16px'}
+});
+</script>
+</body>
+</html>
